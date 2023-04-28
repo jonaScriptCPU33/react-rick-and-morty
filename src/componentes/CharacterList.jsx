@@ -1,29 +1,19 @@
 import { useEffect, useState } from "react"
 import { Character } from "./Character"
+import { Error } from "./Error"
+import { NavPage } from "./NavPage"
+import { Refresh } from "./Refresh"
+import { SearchBar } from "./SearchBar"
 
-
-const NavPage = (props) => {
-    return (
-        <>
-            <header className="d-flex justify-content-between  align-items-center">
-                <button className="btn btn-primary btn-sm"
-                    onClick={() => props.setPage(props.page - 1)}> Page - {props.page - 1}</button>
-                <p>Page: {props.page}</p>
-                <button className="btn btn-primary btn-sm"
-                    onClick={() => props.setPage(props.page + 1)}> Page {props.page + 1}</button>
-            </header>
-        </>
-    )
-}
 
 export const CharacterList = () => {
 
 
     const [characters, setCharacters] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1)
+    const [page, setPage] = useState(1); 
 
-
+    
     useEffect(() => {
         const fetchData = async () => {
             const response = await fetch(`https://rickandmortyapi.com/api/character?page=${page}`)
@@ -31,35 +21,32 @@ export const CharacterList = () => {
             setLoading(false);
             setCharacters(data.results);
         }
-
-
+        
         fetchData()
 
     }, [page])
 
+
     return (
         <div className="container">
-
-
+         
+            <SearchBar setCharacters={setCharacters} />
+            <Refresh  setCharacters={setCharacters} />
             <NavPage page={page} setPage={setPage} />
-
-
-
             {
-                loading ? (<h1>Loading</h1>) : (
+                !characters? (<Error setCharacters={setCharacters}/>) : (
                     <div className="row">
                         {
                             characters.map((character) => (
-                                <div className="col-md-4" key={character.id} >
+                                <div className="col-md-4 mb-4" key={character.id} >
                                     <Character character={character} />
                                 </div>
-
                             ))
                         }
                     </div>
                 )
             }
-            <NavPage page={page} setPage={setPage} />
+            <NavPage page={page} setPage={setPage}  />
         </div>
     )
 }
